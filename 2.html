@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard - Digital Gate Pass System</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="api.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #1e3a8a;
+      --secondary-color: #3b82f6;
+      --accent-color: #06b6d4;
+      --admin-color: #dc2626;
+      --success-color: #059669;
+      --warning-color: #d97706;
+      --danger-color: #dc2626;
+      --dark-color: #1f2937;
+      --white: #ffffff;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-heavy: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      --gradient-admin: linear-gradient(135deg, var(--admin-color) 0%, #ef4444 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .header {
+      background: var(--gradient-primary);
+      color: var(--white);
+      padding: 1rem 0;
+      box-shadow: var(--shadow-medium);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo i {
+      font-size: 2rem;
+    }
+
+    .logo h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--white);
+      color: var(--primary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-logout {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--white);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-logout:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Main Layout */
+    .main-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      display: grid;
+      gap: 2rem;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow-light);
+    }
+
+    .dashboard-title {
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .title-section h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+    }
+
+    .title-section p {
+      color: var(--gray-600);
+      font-size: 1rem;
+    }
+
+    .emergency-btn {
+      background: var(--gradient-admin);
+      color: var(--white);
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow-light);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .stat-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--white);
+    }
+
+    .stat-icon.visitors { background: var(--success-color); }
+    .stat-icon.active { background: var(--warning-color); }
+    .stat-icon.verifications { background: var(--secondary-color); }
+    .stat-icon.uptime { background: var(--accent-color); }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      line-height: 1;
+    }
+
+    .stat-change {
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-top: 0.5rem;
+    }
+
+    .stat-change.positive { color: var(--success-color); }
+    .stat-change.negative { color: var(--danger-color); }
+
+    /* Content Grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+    }
+
+    /* Visitor Management */
+    .visitor-management {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow-light);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+    }
+
+    .filter-select {
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--gray-300);
+      border-radius: 8px;
+      background: var(--white);
+      cursor: pointer;
+    }
+
+    /* Visitor Table */
+    .visitor-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    .visitor-table th,
+    .visitor-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .visitor-table th {
+      background: var(--gray-50);
+      font-weight: 600;
+      color: var(--gray-700);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .visitor-table tr:hover {
+      background: var(--gray-50);
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-active {
+      background: rgba(5, 150, 105, 0.1);
+      color: var(--success-color);
+    }
+
+    .status-pending {
+      background: rgba(217, 119, 6, 0.1);
+      color: var(--warning-color);
+    }
+
+    .status-expired {
+      background: rgba(220, 38, 38, 0.1);
+      color: var(--danger-color);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      border-radius: 6px;
+    }
+
+    .btn-view {
+      background: var(--secondary-color);
+      color: var(--white);
+    }
+
+    .btn-verify {
+      background: var(--success-color);
+      color: var(--white);
+    }
+
+    .btn-revoke {
+      background: var(--danger-color);
+      color: var(--white);
+    }
+
+    /* Right Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    /* Live Activity */
+    .live-activity {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow-light);
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: var(--white);
+      flex-shrink: 0;
+    }
+
+    .activity-icon.entry { background: var(--success-color); }
+    .activity-icon.exit { background: var(--danger-color); }
+    .activity-icon.verification { background: var(--secondary-color); }
+
+    .activity-content {
+      flex: 1;
+    }
+
+    .activity-title {
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 0.25rem;
+    }
+
+    .activity-time {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow-light);
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .action-card {
+      padding: 1.5rem;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .action-card:hover {
+      border-color: var(--secondary-color);
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    .action-card i {
+      font-size: 2rem;
+      color: var(--secondary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .action-card h4 {
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 0.25rem;
+    }
+
+    .action-card p {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+    }
+
+    /* System Health */
+    .system-health {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow-light);
+    }
+
+    .health-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .health-metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-label {
+      font-weight: 500;
+      color: var(--gray-700);
+    }
+
+    .metric-value {
+      font-weight: 600;
+      color: var(--success-color);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 1rem;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .header-content {
+        padding: 0 1rem;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .dashboard-header {
+        padding: 1.5rem;
+      }
+      
+      .visitor-management,
+      .live-activity,
+      .quick-actions {
+        padding: 1.5rem;
+      }
+      
+      .visitor-table {
+        font-size: 0.85rem;
+      }
+      
+      .visitor-table th,
+      .visitor-table td {
+        padding: 0.5rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .action-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <i class="fas fa-shield-alt"></i>
+        <h1>Gate Pass Admin</h1>
+      </div>
+      <div class="header-nav">
+        <div class="user-info">
+          <div class="user-avatar">AD</div>
+          <div>
+            <div style="font-weight: 600;">Admin User</div>
+            <div style="font-size: 0.85rem; opacity: 0.8;">Administrator</div>
+          </div>
+        </div>
+        <button class="btn btn-logout" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div class="dashboard-title">
+        <div class="title-section">
+          <h2>Admin Dashboard</h2>
+          <p>Real-time visitor management and system monitoring</p>
+        </div>
+        <button class="btn emergency-btn" onclick="openEmergencyPanel()">
+          <i class="fas fa-exclamation-triangle"></i>
+          Emergency Panel
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-title">Total Visitors</div>
+          <div class="stat-icon visitors">
+            <i class="fas fa-users"></i>
+          </div>
+        </div>
+        <div class="stat-number">1,247</div>
+        <div class="stat-change positive">
+          <i class="fas fa-arrow-up"></i>
+          +12% from last month
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-title">Active Now</div>
+          <div class="stat-icon active">
+            <i class="fas fa-user-clock"></i>
+          </div>
+        </div>
+        <div class="stat-number">23</div>
+        <div class="stat-change positive">
+          <i class="fas fa-arrow-up"></i>
+          +5 since last hour
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-title">Verifications Today</div>
+          <div class="stat-icon verifications">
+            <i class="fas fa-qrcode"></i>
+          </div>
+        </div>
+        <div class="stat-number">89</div>
+        <div class="stat-change positive">
+          <i class="fas fa-arrow-up"></i>
+          +18% from yesterday
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-title">System Uptime</div>
+          <div class="stat-icon uptime">
+            <i class="fas fa-server"></i>
+          </div>
+        </div>
+        <div class="stat-number">99.9%</div>
+        <div class="stat-change positive">
+          <i class="fas fa-check"></i>
+          All systems operational
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+      <!-- Visitor Management -->
+      <div class="visitor-management">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="fas fa-users"></i>
+            Visitor Management
+          </h3>
+          <button class="btn btn-view" onclick="addNewVisitor()">
+            <i class="fas fa-plus"></i>
+            Add Visitor
+          </button>
+        </div>
+
+        <div class="search-bar">
+          <input type="text" class="search-input" placeholder="Search visitors..." id="searchVisitors">
+          <select class="filter-select" id="statusFilter">
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="expired">Expired</option>
+          </select>
+        </div>
+
+        <table class="visitor-table">
+          <thead>
+            <tr>
+              <th>Visitor</th>
+              <th>Purpose</th>
+              <th>Host</th>
+              <th>Status</th>
+              <th>Entry Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="visitorTableBody">
+            <tr>
+              <td>
+                <div>
+                  <div style="font-weight: 600;">John Doe</div>
+                  <div style="font-size: 0.85rem; color: var(--gray-600);">john.doe@email.com</div>
+                </div>
+              </td>
+              <td>Business Meeting</td>
+              <td>Sarah Wilson</td>
+              <td><span class="status-badge status-active">Active</span></td>
+              <td>14:30 Today</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-view">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="btn btn-sm btn-verify">
+                    <i class="fas fa-qrcode"></i>
+                  </button>
+                  <button class="btn btn-sm btn-revoke">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div>
+                  <div style="font-weight: 600;">Jane Smith</div>
+                  <div style="font-size: 0.85rem; color: var(--gray-600);">jane.smith@email.com</div>
+                </div>
+              </td>
+              <td>Interview</td>
+              <td>Mike Johnson</td>
+              <td><span class="status-badge status-pending">Pending</span></td>
+              <td>16:00 Today</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-view">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="btn btn-sm btn-verify">
+                    <i class="fas fa-check"></i>
+                  </button>
+                  <button class="btn btn-sm btn-revoke">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div>
+                  <div style="font-weight: 600;">Robert Brown</div>
+                  <div style="font-size: 0.85rem; color: var(--gray-600);">robert.brown@email.com</div>
+                </div>
+              </td>
+              <td>Delivery</td>
+              <td>Reception</td>
+              <td><span class="status-badge status-active">Active</span></td>
+              <td>13:15 Today</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-view">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="btn btn-sm btn-verify">
+                    <i class="fas fa-qrcode"></i>
+                  </button>
+                  <button class="btn btn-sm btn-revoke">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Live Activity -->
+        <div class="live-activity">
+          <h3 class="section-title">
+            <i class="fas fa-bell"></i>
+            Live Activity
+          </h3>
+          
+          <div class="activity-item">
+            <div class="activity-icon entry">
+              <i class="fas fa-sign-in-alt"></i>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">John Doe entered</div>
+              <div class="activity-time">2 minutes ago</div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-icon verification">
+              <i class="fas fa-qrcode"></i>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">QR verified for Jane Smith</div>
+              <div class="activity-time">5 minutes ago</div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-icon exit">
+              <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">Michael Chen exited</div>
+              <div class="activity-time">8 minutes ago</div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-icon entry">
+              <i class="fas fa-sign-in-alt"></i>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">Sarah Williams entered</div>
+              <div class="activity-time">12 minutes ago</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <h3 class="section-title">
+            <i class="fas fa-bolt"></i>
+            Quick Actions
+          </h3>
+          
+          <div class="action-grid">
+            <div class="action-card" onclick="generateReport()">
+              <i class="fas fa-chart-bar"></i>
+              <h4>Generate Report</h4>
+              <p>Create visitor analytics</p>
+            </div>
+            
+            <div class="action-card" onclick="backupData()">
+              <i class="fas fa-database"></i>
+              <h4>Backup Data</h4>
+              <p>Export system data</p>
+            </div>
+            
+            <div class="action-card" onclick="systemSettings()">
+              <i class="fas fa-cog"></i>
+              <h4>Settings</h4>
+              <p>Configure system</p>
+            </div>
+            
+            <div class="action-card" onclick="sendBulkNotifications()">
+              <i class="fas fa-paper-plane"></i>
+              <h4>Notifications</h4>
+              <p>Send bulk alerts</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Health -->
+        <div class="system-health">
+          <h3 class="section-title">
+            <i class="fas fa-heartbeat"></i>
+            System Health
+          </h3>
+          
+          <div class="health-metrics">
+            <div class="health-metric">
+              <span class="metric-label">Database Status</span>
+              <span class="metric-value">
+                <i class="fas fa-check-circle"></i> Online
+              </span>
+            </div>
+            
+            <div class="health-metric">
+              <span class="metric-label">QR Generation</span>
+              <span class="metric-value">
+                <i class="fas fa-check-circle"></i> Active
+              </span>
+            </div>
+            
+            <div class="health-metric">
+              <span class="metric-label">Notifications</span>
+              <span class="metric-value">
+                <i class="fas fa-check-circle"></i> Working
+              </span>
+            </div>
+            
+            <div class="health-metric">
+              <span class="metric-label">Blockchain Sync</span>
+              <span class="metric-value">
+                <i class="fas fa-check-circle"></i> Synced
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Admin Dashboard JavaScript
+    
+    // Check session on page load
+    function checkAdminSession() {
+      var session = sessionStorage.getItem('gatePassSession');
+      if (!session) {
+        alert('Session expired. Please login again.');
+        window.location.href = 'index.html';
+        return false;
+      }
+      
+      var sessionData = JSON.parse(session);
+      
+      if (sessionData.role !== 'admin') {
+        alert('Access denied. Admin access required.');
+        window.location.href = 'index.html';
+        return false;
+      }
+      
+      // Update user info
+      document.querySelector('.user-avatar').textContent = sessionData.name.split(' ').map(n => n[0]).join('');
+      document.querySelector('.user-info div:first-child').textContent = sessionData.name;
+      
+      return true;
+    }
+    
+    // Sample visitor data
+    const visitors = [
+      {
+        id: 'V001',
+        name: 'John Doe',
+        email: 'john.doe@email.com',
+        purpose: 'Business Meeting',
+        host: 'Sarah Wilson',
+        status: 'active',
+        entryTime: '14:30 Today'
+      },
+      {
+        id: 'V002',
+        name: 'Jane Smith',
+        email: 'jane.smith@email.com',
+        purpose: 'Interview',
+        host: 'Mike Johnson',
+        status: 'pending',
+        entryTime: '16:00 Today'
+      },
+      {
+        id: 'V003',
+        name: 'Robert Brown',
+        email: 'robert.brown@email.com',
+        purpose: 'Delivery',
+        host: 'Reception',
+        status: 'active',
+        entryTime: '13:15 Today'
+      }
+    ];
+
+    // Initialize dashboard
+    function initializeDashboard() {
+      updateLiveStats();
+      setupEventListeners();
+      // load dynamic visitors list from backend if available
+      if (typeof loadVisitorList === 'function') loadVisitorList();
+    }
+
+    // Load visitors from backend and render into table
+    function loadVisitorList() {
+      if (typeof gatePassAPI === 'undefined') return;
+      gatePassAPI.getAllVisitors().then(function (resp) {
+        if (!resp || !resp.success) return;
+        const tbody = document.getElementById('visitorTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        resp.visitors.forEach(function (v) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>
+              <div>
+                <div style="font-weight: 600;">${v.full_name}</div>
+                <div style="font-size: 0.85rem; color: var(--gray-600);">${v.email}</div>
+              </div>
+            </td>
+            <td>${v.purpose || ''}</td>
+            <td>${v.host_name || ''}</td>
+            <td><span class="status-badge ${v.status === 'active' ? 'status-active' : v.status === 'pending' ? 'status-pending' : 'status-expired'}">${v.status}</span></td>
+            <td>${new Date(v.created_at).toLocaleString()}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-sm btn-view" onclick="viewVisitor('${v.visitor_id}')"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-sm btn-verify" onclick="verifyVisitor('${v.visitor_id}')"><i class="fas fa-qrcode"></i></button>
+                <button class="btn btn-sm btn-revoke" onclick="revokeVisitor('${v.visitor_id}')"><i class="fas fa-times"></i></button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }).catch(function (err) {
+        console.error('Failed to load visitors', err);
+      });
+    }
+
+    // Update live statistics
+    function updateLiveStats() {
+      // Simulate real-time updates
+      setInterval(() => {
+        // Update active visitors count
+        const activeCount = document.querySelector('.stat-card:nth-child(2) .stat-number');
+        if (activeCount) {
+          const currentCount = parseInt(activeCount.textContent);
+          const newCount = currentCount + Math.floor(Math.random() * 3) - 1;
+          activeCount.textContent = Math.max(0, newCount);
+        }
+
+        // Update verifications count
+        const verificationsCount = document.querySelector('.stat-card:nth-child(3) .stat-number');
+        if (verificationsCount) {
+          const currentCount = parseInt(verificationsCount.textContent);
+          const newCount = currentCount + Math.floor(Math.random() * 2);
+          verificationsCount.textContent = newCount;
+        }
+      }, 30000); // Update every 30 seconds
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+      // Search functionality
+      const searchInput = document.getElementById('searchVisitors');
+      if (searchInput) {
+        searchInput.addEventListener('input', filterVisitors);
+      }
+
+      // Status filter
+      const statusFilter = document.getElementById('statusFilter');
+      if (statusFilter) {
+        statusFilter.addEventListener('change', filterVisitors);
+      }
+    }
+
+    // Filter visitors based on search and status
+    function filterVisitors() {
+      const searchTerm = document.getElementById('searchVisitors').value.toLowerCase();
+      const statusFilter = document.getElementById('statusFilter').value;
+      const tableBody = document.getElementById('visitorTableBody');
+      const rows = tableBody.getElementsByTagName('tr');
+
+      Array.from(rows).forEach(row => {
+        const name = row.cells[0].textContent.toLowerCase();
+        const purpose = row.cells[1].textContent.toLowerCase();
+        const statusCell = row.cells[3];
+        const status = statusCell.textContent.toLowerCase();
+
+        const matchesSearch = name.includes(searchTerm) || purpose.includes(searchTerm);
+        const matchesStatus = statusFilter === 'all' || status.includes(statusFilter);
+
+        row.style.display = matchesSearch && matchesStatus ? '' : 'none';
+      });
+    }
+
+    // Emergency panel function
+    function openEmergencyPanel() {
+      showNotification('Opening Emergency Panel...', 'info');
+      setTimeout(() => {
+        // Simulate opening emergency panel
+        const emergencyData = {
+          totalVisitors: 23,
+          emergencyExits: 4,
+          evacuationTime: '3.5 minutes',
+          unaccountedVisitors: 0
+        };
+        
+        alert(`Emergency Panel Active\n\nCurrent Visitors Inside: ${emergencyData.totalVisitors}\nEmergency Exits Available: ${emergencyData.emergencyExits}\nEstimated Evacuation Time: ${emergencyData.evacuationTime}\nUnaccounted Visitors: ${emergencyData.unaccountedVisitors}`);
+      }, 1000);
+    }
+
+    // Quick action functions
+    function addNewVisitor() {
+      // Prompt admin for visitor details and register via API
+      const name = prompt('Visitor full name:');
+      if (!name) return;
+      const email = prompt('Visitor email:');
+      if (!email) return;
+      const contact = prompt('Visitor contact number:');
+      if (!contact) return;
+      const purpose = prompt('Purpose of visit:','Meeting');
+      if (!purpose) return;
+      const host = prompt('Host/employee name:','Reception');
+      if (!host) return;
+
+      showNotification('Registering visitor...', 'info');
+      gatePassAPI.registerVisitor(name, email, contact, purpose, host).then(resp => {
+        if (resp.success) {
+          showNotification('Visitor added: ' + resp.visitor.id, 'success');
+          // If visitor table exists on page, try to refresh by fetching visitors
+          if (typeof loadVisitorList === 'function') loadVisitorList();
+        } else {
+          showNotification('Failed to add visitor: ' + (resp.error || resp.message), 'error');
+        }
+      }).catch(err => {
+        showNotification('Error registering visitor', 'error');
+      });
+    }
+
+    function generateReport() {
+      showNotification('Generating visitor analytics report...', 'info');
+      setTimeout(() => {
+        showNotification('Report generated successfully! Check your downloads.', 'success');
+      }, 2000);
+    }
+
+    function backupData() {
+      showNotification('Starting system backup...', 'info');
+      setTimeout(() => {
+        showNotification('System backup completed successfully!', 'success');
+      }, 3000);
+    }
+
+    function systemSettings() {
+      showNotification('Opening system settings...', 'info');
+    }
+
+    function sendBulkNotifications() {
+      showNotification('Sending bulk notifications to all hosts...', 'info');
+      setTimeout(() => {
+        showNotification('Bulk notifications sent successfully!', 'success');
+      }, 2000);
+    }
+
+    // Logout function
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        showNotification('Logging out...', 'info');
+        setTimeout(() => {
+          // Redirect to login page
+          window.location.href = 'index.html';
+        }, 1000);
+      }
+    }
+
+    // Revoke visitor (call backend) and refresh list
+    function revokeVisitor(visitorId) {
+      if (!confirm('Revoke this visitor access?')) return;
+      showNotification('Revoking visitor...', 'info');
+      if (typeof gatePassAPI === 'undefined' || !gatePassAPI.revokeVisitor) {
+        showNotification('API not available', 'error');
+        return;
+      }
+      gatePassAPI.revokeVisitor(visitorId).then(function(resp) {
+        if (resp && resp.success) {
+          showNotification('Visitor revoked', 'success');
+          if (typeof loadVisitorList === 'function') loadVisitorList();
+        } else {
+          showNotification('Failed to revoke: ' + (resp.error || resp.message), 'error');
+        }
+      }).catch(function(err) {
+        console.error('Revoke error', err);
+        showNotification('Error revoking visitor', 'error');
+      });
+    }
+
+    // Notification system
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 2rem;
+        background: ${type === 'success' ? '#059669' : type === 'error' ? '#dc2626' : '#3b82f6'};
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+      `;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+
+    // Add CSS for notification animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Logout function
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        sessionStorage.removeItem('gatePassSession');
+        window.location.href = 'index.html';
+      }
+    }
+
+    // Initialize dashboard when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      if (checkAdminSession()) {
+        initializeDashboard();
+      }
+    });
+   
+
+  </script>
+</body>
+</html>
