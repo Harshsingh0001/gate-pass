@@ -6,7 +6,11 @@
   <title>Digital Gate Pass System - Secure Access Management</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="api.js"></script>
+  <!-- Example navigation links -->
+  <a href="index.html">Home</a>
+  <a href="2.html">Admin</a>
+  <a href="3.html">Visitor</a>
+  <a href="4.html">Security</a>
   <style>
     * {
       margin: 0;
@@ -302,6 +306,18 @@
       box-shadow: var(--shadow-medium);
     }
 
+    /* NEW: Security button style */
+    .btn-security {
+      background: var(--gradient-primary);
+      color: var(--white);
+      flex: 1;
+    }
+
+    .btn-security:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
     .btn-secondary {
       background: var(--gradient-accent);
       color: var(--white);
@@ -361,6 +377,12 @@
       background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
     }
 
+    /* NEW: Security card style */
+    .registration-card.security-card {
+      border-color: var(--primary-color);
+      background: linear-gradient(135deg, rgba(30, 64, 175, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+    }
+
     .card-icon {
       font-size: 2.5rem;
       margin-bottom: 1rem;
@@ -373,6 +395,10 @@
 
     .admin-card .card-icon {
       color: var(--admin-color);
+    }
+
+    .security-card .card-icon {
+      color: var(--primary-color);
     }
 
     .card-title {
@@ -949,6 +975,17 @@
               Register as Admin
             </button>
           </div>
+
+          <!-- NEW: Security Registration Card -->
+          <div class="registration-card security-card" id="securityRegCard">
+            <i class="fas fa-user-secret card-icon"></i>
+            <h4 class="card-title">Security Registration</h4>
+            <p class="card-description">Register as security staff to verify and manage gate passes</p>
+            <button class="btn btn-security" id="securityRegBtn">
+              <i class="fas fa-user-shield"></i>
+              Register as Security
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -1131,6 +1168,60 @@
         <button type="submit" class="btn btn-admin">
           <i class="fas fa-user-cog"></i>
           Complete Admin Registration
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- NEW: Security Registration Modal -->
+  <div id="securityModal" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" id="closeSecurityModal">&times;</button>
+      <h2 class="section-title" style="color: var(--primary-color);">
+        <i class="fas fa-user-secret"></i>
+        Security Registration
+      </h2>
+      <p class="section-subtitle">Complete the form below to register as security staff</p>
+      
+      <form class="login-form" id="securityRegForm">
+        <div class="form-group">
+          <label class="form-label">Security Name</label>
+          <input type="text" class="form-input" placeholder="Enter your full name" required />
+          <i class="fas fa-user-shield input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Security ID / Employee ID</label>
+          <input type="text" class="form-input" placeholder="Enter your security ID" required />
+          <i class="fas fa-id-card input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Number</label>
+          <input type="tel" class="form-input" placeholder="Enter your phone number" required />
+          <i class="fas fa-phone input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assigned Gate / Post</label>
+          <input type="text" class="form-input" placeholder="Example: Main Gate, Gate 2" required />
+          <i class="fas fa-door-open input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Shift Timing</label>
+          <input type="text" class="form-input" placeholder="Example: 8 AM - 4 PM" required />
+          <i class="fas fa-clock input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" placeholder="Create a secure password" required />
+          <i class="fas fa-lock input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" class="form-input" placeholder="Confirm your password" required />
+          <i class="fas fa-lock input-icon"></i>
+        </div>
+        <button type="submit" class="btn btn-security">
+          <i class="fas fa-user-check"></i>
+          Complete Security Registration
         </button>
       </form>
     </div>
@@ -1320,6 +1411,22 @@
       } catch (error) {
         alert('Connection error: Make sure backend server is running on http://localhost:5000');
       }
+    });
+
+    // NEW: Security registration
+    document.getElementById('securityRegBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      openModal('securityModal');
+    });
+
+    document.getElementById('closeSecurityModal').addEventListener('click', function() {
+      closeModal('securityModal');
+    });
+
+    document.getElementById('securityRegForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Security registration would be processed here!');
+      closeModal('securityModal');
     });
 
     // Close modal when clicking outside
