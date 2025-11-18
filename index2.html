@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Digital Gate Pass System - Secure Access Management</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Example navigation links -->
+  <a href="index.html">Home</a>
+  <a href="2.html">Admin</a>
+  <a href="3.html">Visitor</a>
+  <a href="4.html">Security</a>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #1e3a8a;
+      --secondary-color: #3b82f6;
+      --accent-color: #06b6d4;
+      --admin-color: #dc2626;
+      --visitor-color: #059669;
+      --dark-color: #1f2937;
+      --light-color: #f8fafc;
+      --white: #ffffff;
+      --gray-100: #f1f5f9;
+      --gray-300: #cbd5e1;
+      --gray-600: #475569;
+      --gray-800: #1e293b;
+      --success-color: #10b981;
+      --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-heavy: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      --gradient-accent: linear-gradient(135deg, var(--accent-color) 0%, var(--secondary-color) 100%);
+      --gradient-admin: linear-gradient(135deg, var(--admin-color) 0%, #ef4444 100%);
+      --gradient-visitor: linear-gradient(135deg, var(--visitor-color) 0%, #10b981 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      color: var(--gray-800);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background particles */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.1;
+    }
+
+    .particle {
+      position: absolute;
+      background: var(--white);
+      border-radius: 50%;
+      animation: float 15s infinite linear;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(100vh) rotate(0deg); }
+      100% { transform: translateY(-100vh) rotate(360deg); }
+    }
+
+    /* Header Styles */
+    header {
+      background: var(--gradient-primary);
+      color: var(--white);
+      padding: 2rem 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-heavy);
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .header-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: inline-block;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .header-title {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header-subtitle {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-weight: 300;
+      opacity: 0.9;
+    }
+
+    /* Main Container */
+    .main-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    /* Login Section */
+    .login-section {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 3rem;
+      box-shadow: var(--shadow-heavy);
+      position: relative;
+      overflow: hidden;
+      transform: translateY(0);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .login-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--gradient-accent);
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--dark-color);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-subtitle {
+      color: var(--gray-600);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    /* Form Styles */
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      position: relative;
+    }
+
+    .form-label {
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+      display: block;
+      font-size: 0.9rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3rem;
+      border: 2px solid var(--gray-300);
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: var(--gray-100);
+      font-family: inherit;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 3.2rem;
+      color: var(--gray-600);
+      transition: color 0.3s ease;
+    }
+
+    .form-input:focus + .input-icon {
+      color: var(--secondary-color);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+      margin: 0.5rem;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: var(--white);
+      margin-top: 1rem;
+      width: calc(100% - 1rem);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .btn-visitor {
+      background: var(--gradient-visitor);
+      color: var(--white);
+      flex: 1;
+    }
+
+    .btn-visitor:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .btn-admin {
+      background: var(--gradient-admin);
+      color: var(--white);
+      flex: 1;
+    }
+
+    .btn-admin:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    /* NEW: Security button style */
+    .btn-security {
+      background: var(--gradient-primary);
+      color: var(--white);
+      flex: 1;
+    }
+
+    .btn-security:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .btn-secondary {
+      background: var(--gradient-accent);
+      color: var(--white);
+      margin-top: 1rem;
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    /* Registration Options */
+    .registration-options {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 2px solid var(--gray-300);
+    }
+
+    .registration-title {
+      text-align: center;
+      color: var(--gray-700);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    .registration-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .registration-card {
+      flex: 1;
+      min-width: 200px;
+      background: var(--gray-100);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .registration-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .registration-card.visitor-card {
+      border-color: var(--visitor-color);
+      background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+    }
+
+    .registration-card.admin-card {
+      border-color: var(--admin-color);
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+    }
+
+    /* NEW: Security card style */
+    .registration-card.security-card {
+      border-color: var(--primary-color);
+      background: linear-gradient(135deg, rgba(30, 64, 175, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+    }
+
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .visitor-card .card-icon {
+      color: var(--visitor-color);
+    }
+
+    .admin-card .card-icon {
+      color: var(--admin-color);
+    }
+
+    .security-card .card-icon {
+      color: var(--primary-color);
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: var(--gray-800);
+    }
+
+    .card-description {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    .forgot-password {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .forgot-password a {
+      color: var(--secondary-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+    }
+
+    .forgot-password a:hover {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
+
+    /* About Section - EXPANDED */
+    .about-section {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 3rem;
+      box-shadow: var(--shadow-heavy);
+      position: relative;
+      overflow: hidden;
+      transform: translateY(0);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .about-section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .about-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .overview-intro {
+      background: var(--gray-100);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--accent-color);
+    }
+
+    .overview-intro p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--gray-700);
+      margin-bottom: 1rem;
+    }
+
+    .overview-intro p:last-child {
+      margin-bottom: 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .stat-item {
+      background: var(--gradient-accent);
+      color: var(--white);
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .stat-item:hover {
+      transform: scale(1.05);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .feature-list {
+      list-style: none;
+      margin-top: 2rem;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--gray-300);
+      transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+      background: var(--gray-100);
+      padding-left: 1rem;
+      border-radius: 8px;
+      border-bottom-color: transparent;
+    }
+
+    .feature-item:last-child {
+      border-bottom: none;
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      flex-shrink: 0;
+    }
+
+    .feature-content {
+      flex: 1;
+    }
+
+    .feature-title {
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-description {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      line-height: 1.4;
+    }
+
+    /* Technology Stack Section */
+    .tech-section {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 2px solid var(--gray-300);
+    }
+
+    .tech-title {
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .tech-category {
+      background: var(--gray-100);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .tech-category:hover {
+      background: var(--gray-200);
+      transform: translateY(-2px);
+    }
+
+    .tech-category-title {
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .tech-list {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+      line-height: 1.4;
+    }
+
+    /* Security & Compliance Section */
+    .security-section {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border-radius: 12px;
+      border: 2px solid var(--primary-color);
+    }
+
+    .security-title {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .security-features {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .security-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--gray-700);
+    }
+
+    .security-item i {
+      color: var(--success-color);
+      width: 16px;
+    }
+
+    .contact-admin {
+      text-align: center;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--gray-300);
+    }
+
+    .contact-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--dark-color);
+      color: var(--white);
+      text-align: center;
+      padding: 2rem 0;
+      margin-top: 4rem;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--gray-300);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-color);
+    }
+
+    .tech-stack {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-top: 1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 968px) {
+      .main-container {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        padding: 3rem 1rem;
+      }
+      
+      .login-section,
+      .about-section {
+        padding: 2rem;
+      }
+      
+      .header-content {
+        padding: 0 1rem;
+      }
+
+      .registration-buttons {
+        flex-direction: column;
+      }
+
+      .registration-card {
+        min-width: auto;
+      }
+
+      .stats-grid,
+      .tech-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .feature-list {
+        font-size: 0.9rem;
+      }
+      
+      .btn {
+        padding: 0.875rem 1.5rem;
+      }
+      
+      .login-section,
+      .about-section {
+        padding: 1.5rem;
+      }
+
+      .contact-buttons {
+        flex-direction: column;
+      }
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--white);
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* UPDATED Modal styles for registration forms - 20% smaller */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* REDUCED modal content size by 20% */
+    .modal-content {
+      background: var(--white);
+      border-radius: 16px; /* Reduced from 20px */
+      padding: 2rem; /* Reduced from 3rem */
+      max-width: 420px; /* Reduced from 500px */
+      width: 85%; /* Reduced from 90% */
+      max-height: 85vh; /* Reduced from 90vh */
+      overflow-y: auto;
+      position: relative;
+      animation: slideIn 0.3s ease;
+      box-shadow: var(--shadow-heavy);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-40px); opacity: 0; } /* Reduced from -50px */
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* REDUCED modal form spacing */
+    .modal .section-title {
+      font-size: 1.5rem; /* Reduced from 1.8rem */
+      margin-bottom: 0.4rem; /* Reduced from 0.5rem */
+    }
+
+    .modal .section-subtitle {
+      margin-bottom: 1.5rem; /* Reduced from 2rem */
+      font-size: 0.9rem; /* Reduced from 0.95rem */
+    }
+
+    .modal .login-form {
+      gap: 1.2rem; /* Reduced from 1.5rem */
+    }
+
+    .modal .form-group {
+      position: relative;
+    }
+
+    .modal .form-label {
+      font-size: 0.85rem; /* Reduced from 0.9rem */
+      margin-bottom: 0.4rem; /* Reduced from 0.5rem */
+    }
+
+    .modal .form-input {
+      padding: 0.8rem 0.8rem 0.8rem 2.5rem; /* Reduced from 1rem 1rem 1rem 3rem */
+      font-size: 0.9rem; /* Reduced from 1rem */
+      border-radius: 10px; /* Reduced from 12px */
+    }
+
+    .modal .input-icon {
+      left: 0.8rem; /* Reduced from 1rem */
+      top: 2.8rem; /* Adjusted for smaller input */
+      font-size: 0.9rem; /* Slightly smaller icon */
+    }
+
+    .modal .btn {
+      padding: 0.8rem 1.5rem; /* Reduced from 1rem 2rem */
+      font-size: 0.9rem; /* Reduced from 1rem */
+      border-radius: 10px; /* Reduced from 12px */
+      margin: 0.3rem; /* Reduced from 0.5rem */
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 0.8rem; /* Reduced from 1rem */
+      right: 0.8rem; /* Reduced from 1rem */
+      background: none;
+      border: none;
+      font-size: 1.3rem; /* Reduced from 1.5rem */
+      cursor: pointer;
+      color: var(--gray-600);
+      transition: color 0.3s ease;
+    }
+
+    .close-btn:hover {
+      color: var(--admin-color);
+    }
+
+    /* Mobile responsiveness for smaller modals */
+    @media (max-width: 640px) {
+      .modal-content {
+        padding: 1.5rem; /* Further reduced for mobile */
+        max-width: 95%;
+        width: 95%;
+      }
+      
+      .modal .form-input {
+        padding: 0.7rem 0.7rem 0.7rem 2.2rem;
+      }
+      
+      .modal .input-icon {
+        left: 0.7rem;
+        top: 2.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- put this just before </body> on each page -->
+  <script src="connect-pages.js"></script>
+
+  <!-- Animated Background -->
+  <div class="bg-animation" id="particles"></div>
+
+  <header>
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <h1 class="header-title">Digital Gate Pass System</h1>
+      <p class="header-subtitle">Advanced Security • Seamless Access • Complete Control</p>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <section class="login-section">
+      <h2 class="section-title">
+        <i class="fas fa-sign-in-alt"></i>
+        Secure Access
+      </h2>
+      <p class="section-subtitle">Sign in to manage your digital gate passes and access control</p>
+      
+      <form class="login-form" id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="username">Username or Email</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            class="form-input" 
+            placeholder="Enter your credentials"
+            required
+          />
+          <i class="fas fa-user input-icon"></i>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            class="form-input" 
+            placeholder="Enter your password"
+            required
+          />
+          <i class="fas fa-lock input-icon"></i>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="loginBtn">
+          <i class="fas fa-sign-in-alt"></i>
+          Sign In Securely
+        </button>
+      </form>
+
+      <div class="forgot-password">
+        <a href="#" id="forgotPassword">
+          <i class="fas fa-question-circle"></i>
+          Forgot your password?
+        </a>
+      </div>
+
+      <!-- Registration Options -->
+      <div class="registration-options">
+        <h3 class="registration-title">
+          <i class="fas fa-user-plus"></i>
+          New User Registration
+        </h3>
+        
+        <div class="registration-buttons">
+          <div class="registration-card visitor-card" id="visitorRegCard">
+            <i class="fas fa-users card-icon"></i>
+            <h4 class="card-title">Visitor Registration</h4>
+            <p class="card-description">Register as a visitor to get temporary access passes</p>
+            <button class="btn btn-visitor" id="visitorRegBtn">
+              <i class="fas fa-user-plus"></i>
+              Register as Visitor
+            </button>
+          </div>
+
+          <div class="registration-card admin-card" id="adminRegCard">
+            <i class="fas fa-user-shield card-icon"></i>
+            <h4 class="card-title">Admin Registration</h4>
+            <p class="card-description">Register as admin to manage system and users</p>
+            <button class="btn btn-admin" id="adminRegBtn">
+              <i class="fas fa-user-cog"></i>
+              Register as Admin
+            </button>
+          </div>
+
+          <!-- NEW: Security Registration Card -->
+          <div class="registration-card security-card" id="securityRegCard">
+            <i class="fas fa-user-secret card-icon"></i>
+            <h4 class="card-title">Security Registration</h4>
+            <p class="card-description">Register as security staff to verify and manage gate passes</p>
+            <button class="btn btn-security" id="securityRegBtn">
+              <i class="fas fa-user-shield"></i>
+              Register as Security
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        System Overview
+      </h2>
+
+      <!-- Performance Stats -->
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-number">2-3s</span>
+          <span class="stat-label">QR Verification Time</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">99.9%</span>
+          <span class="stat-label">System Uptime</span>
+        </div>
+      </div>
+
+      <!-- Key Features -->
+      <ul class="feature-list">
+        <li class="feature-item">
+          <div class="feature-icon">
+            <i class="fas fa-qrcode"></i>
+          </div>
+          <div class="feature-content">
+            <div class="feature-title">Instant QR Generation</div>
+            <div class="feature-description">Secure, unique codes with cryptographic algorithms and 2-3 second verification via WebSocket technology</div>
+          </div>
+        </li>
+    
+        <li class="feature-item">
+          <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="feature-content">
+            <div class="feature-title">Advanced Security</div>
+            <div class="feature-description">AES-256 encryption, SHA-256 hashing, JWT authentication, and blockchain-based logging</div>
+          </div>
+        </li>
+      </ul>
+
+      <!-- Security & Compliance -->
+      <div class="security-section">
+        <h3 class="security-title">
+          <i class="fas fa-lock"></i>
+          Security & Compliance
+        </h3>
+        <div class="security-features">
+          <div class="security-item">
+            <i class="fas fa-check"></i>
+            <span>End-to-end AES-256 encryption for all data transmission</span>
+          </div>
+          <div class="security-item">
+            <i class="fas fa-check"></i>
+            <span>SHA-256 cryptographic hashing for data integrity</span>
+          </div>
+          <div class="security-item">
+            <i class="fas fa-check"></i>
+            <span>JWT-based secure authentication and authorization</span>
+          </div>
+          <div class="security-item">
+            <i class="fas fa-check"></i>
+            <span>Blockchain-based immutable audit logging</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Options -->
+      <div class="contact-admin">
+        <div class="contact-buttons">
+          <a href="#" class="btn btn-secondary" id="contactAdmin">
+            <i class="fas fa-headset"></i>
+            Contact Administrator
+          </a>
+          <a href="#" class="btn btn-secondary" id="helpCenter">
+            <i class="fas fa-question-circle"></i>
+            Help Center
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Visitor Registration Modal -->
+  <div id="visitorModal" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" id="closeVisitorModal">&times;</button>
+      <h2 class="section-title" style="color: var(--visitor-color);">
+        <i class="fas fa-users"></i>
+        Visitor Registration
+      </h2>
+      <p class="section-subtitle">Complete the form below to register as a visitor</p>
+      
+      <form class="login-form" id="visitorRegForm">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" placeholder="Enter your full name" required />
+          <i class="fas fa-user input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Number</label>
+          <input type="tel" class="form-input" placeholder="Enter your phone number" required />
+          <i class="fas fa-phone input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" placeholder="Enter your email" required />
+          <i class="fas fa-envelope input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Purpose of Visit</label>
+          <input type="text" class="form-input" placeholder="Brief purpose of your visit" required />
+          <i class="fas fa-clipboard input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Host/Employee Name</label>
+          <input type="text" class="form-input" placeholder="Person you're visiting" required />
+          <i class="fas fa-user-tie input-icon"></i>
+        </div>
+        <button type="submit" class="btn btn-visitor">
+          <i class="fas fa-user-plus"></i>
+          Complete Visitor Registration
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Registration Modal -->
+  <div id="adminModal" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" id="closeAdminModal">&times;</button>
+      <h2 class="section-title" style="color: var(--admin-color);">
+        <i class="fas fa-user-shield"></i>
+        Admin Registration
+      </h2>
+      <p class="section-subtitle">Complete the form below to register as an administrator</p>
+      
+      <form class="login-form" id="adminRegForm">
+        <div class="form-group">
+          <label class="form-label">Admin Name</label>
+          <input type="text" class="form-input" placeholder="Enter your full name" required />
+          <i class="fas fa-user-shield input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Official Email</label>
+          <input type="email" class="form-input" placeholder="Enter your official email" required />
+          <i class="fas fa-envelope input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Number</label>
+          <input type="tel" class="form-input" placeholder="Enter your phone number" required />
+          <i class="fas fa-phone input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Department/Role</label>
+          <input type="text" class="form-input" placeholder="Your department or role" required />
+          <i class="fas fa-building input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Employee ID</label>
+          <input type="text" class="form-input" placeholder="Your employee ID" required />
+          <i class="fas fa-id-card input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" placeholder="Create a secure password" required />
+          <i class="fas fa-lock input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" class="form-input" placeholder="Confirm your password" required />
+          <i class="fas fa-lock input-icon"></i>
+        </div>
+        <button type="submit" class="btn btn-admin">
+          <i class="fas fa-user-cog"></i>
+          Complete Admin Registration
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- NEW: Security Registration Modal -->
+  <div id="securityModal" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" id="closeSecurityModal">&times;</button>
+      <h2 class="section-title" style="color: var(--primary-color);">
+        <i class="fas fa-user-secret"></i>
+        Security Registration
+      </h2>
+      <p class="section-subtitle">Complete the form below to register as security staff</p>
+      
+      <form class="login-form" id="securityRegForm">
+        <div class="form-group">
+          <label class="form-label">Security Name</label>
+          <input type="text" class="form-input" placeholder="Enter your full name" required />
+          <i class="fas fa-user-shield input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Security ID / Employee ID</label>
+          <input type="text" class="form-input" placeholder="Enter your security ID" required />
+          <i class="fas fa-id-card input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Number</label>
+          <input type="tel" class="form-input" placeholder="Enter your phone number" required />
+          <i class="fas fa-phone input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assigned Gate / Post</label>
+          <input type="text" class="form-input" placeholder="Example: Main Gate, Gate 2" required />
+          <i class="fas fa-door-open input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Shift Timing</label>
+          <input type="text" class="form-input" placeholder="Example: 8 AM - 4 PM" required />
+          <i class="fas fa-clock input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" placeholder="Create a secure password" required />
+          <i class="fas fa-lock input-icon"></i>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" class="form-input" placeholder="Confirm your password" required />
+          <i class="fas fa-lock input-icon"></i>
+        </div>
+        <button type="submit" class="btn btn-security">
+          <i class="fas fa-user-check"></i>
+          Complete Security Registration
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="#"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+        <a href="#"><i class="fas fa-file-contract"></i> Terms of Service</a>
+        <a href="#"><i class="fas fa-question-circle"></i> Help Center</a>
+        <a href="#"><i class="fas fa-phone"></i> Support</a>
+      </div>
+      <p>&copy; 2025 Digital Gate Pass System. All rights reserved.</p>
+      <div class="tech-stack">
+        <i class="fab fa-react"></i> React.js • 
+        <i class="fab fa-node-js"></i> Node.js • 
+        <i class="fas fa-database"></i> MySQL • 
+        <i class="fas fa-lock"></i> Enterprise Security
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Create animated particles
+    function createParticles() {
+      const container = document.getElementById('particles');
+      const particleCount = 50;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.width = particle.style.height = Math.random() * 4 + 2 + 'px';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        container.appendChild(particle);
+      }
+    }
+
+    // Modal functionality
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+
+    // Form interaction (original loader)
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const originalText = btn.innerHTML;
+      
+      btn.innerHTML = '<div class="loading"></div> Authenticating...';
+      btn.disabled = true;
+      
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        // alert('Login functionality would be implemented here!');
+      }, 1500);
+    });
+
+    // Visitor registration
+    document.getElementById('visitorRegBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      openModal('visitorModal');
+    });
+
+    document.getElementById('closeVisitorModal').addEventListener('click', function() {
+      closeModal('visitorModal');
+    });
+
+    document.getElementById('visitorRegForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Visitor registration would be processed here!');
+      closeModal('visitorModal');
+    });
+
+    // Admin registration
+    document.getElementById('adminRegBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      openModal('adminModal');
+    });
+
+    document.getElementById('closeAdminModal').addEventListener('click', function() {
+      closeModal('adminModal');
+    });
+
+    document.getElementById('adminRegForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Admin registration would be processed here!');
+      closeModal('adminModal');
+    });
+
+    // NEW: Security registration
+    document.getElementById('securityRegBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      openModal('securityModal');
+    });
+
+    document.getElementById('closeSecurityModal').addEventListener('click', function() {
+      closeModal('securityModal');
+    });
+
+    document.getElementById('securityRegForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Security registration would be processed here!');
+      closeModal('securityModal');
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal')) {
+        closeModal(e.target.id);
+      }
+    });
+
+    // Initialize particles on load
+    window.addEventListener('load', createParticles);
+
+    // Other interactive elements
+    document.getElementById('contactAdmin').addEventListener('click', function(e) {
+      e.preventDefault();
+      alert('Contact admin functionality would be implemented here!');
+    });
+
+    document.getElementById('helpCenter').addEventListener('click', function(e) {
+      e.preventDefault();
+      alert('Help center would open here!');
+    });
+
+    document.getElementById('forgotPassword').addEventListener('click', function(e) {
+      e.preventDefault();
+      alert('Password recovery functionality would be implemented here!');
+    });
+
+    // Role-based redirect after "authentication"
+    document.getElementById("loginForm").addEventListener("submit", function(e){
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+
+      if (username.includes("admin")) {
+        window.location.href = "2.html"; // Admin dashboard
+      } else if (username.includes("guard") || username.includes("security")) {
+        window.location.href = "4.html"; // Security page
+      } else {
+        window.location.href = "33.html"; // Visitor dashboard
+      }
+    });
+  </script>
+</body>
+</html>
